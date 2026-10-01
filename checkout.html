@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Оформлення замовлення | Crystal Christmas</title>
+
+    <link rel="stylesheet" href="checkout.css">
+</head>
+
+
+<body>
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="checkout-header">
+
+    <a href="index.html" class="checkout-logo">
+
+        <span>HANDMADE ORNAMENTS</span>
+
+        <strong>
+            CRYSTAL CHRISTMAS
+        </strong>
+
+    </a>
+
+
+    <a href="index.html" class="back-shop">
+        ← ПОВЕРНУТИСЯ В МАГАЗИН
+    </a>
+
+</header>
+
+
+<!-- =========================
+     CHECKOUT
+========================= -->
+
+<main class="checkout-page">
+
+
+    <!-- LEFT SIDE -->
+
+    <section class="checkout-form-section">
+
+
+        <p class="small-title">
+            CRYSTAL CHRISTMAS
+        </p>
+
+
+        <h1>
+            Оформлення
+            <br>
+            замовлення
+        </h1>
+
+
+        <p class="checkout-intro">
+            Заповніть дані для доставки.
+            Після оформлення ми зв'яжемося
+            з вами для підтвердження замовлення.
+        </p>
+
+
+
+        <form id="checkout-form">
+
+
+            <!-- CONTACT DATA -->
+
+            <div class="checkout-block">
+
+                <div class="block-number">
+                    01
+                </div>
+
+
+                <div class="block-content">
+
+                    <h2>
+                        Контактні дані
+                    </h2>
+
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label for="first-name">
+                                Ім'я *
+                            </label>
+
+                            <input
+                                type="text"
+                                id="first-name"
+                                required
+                                placeholder="Ваше ім'я"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="last-name">
+                                Прізвище *
+                            </label>
+
+                            <input
+                                type="text"
+                                id="last-name"
+                                required
+                                placeholder="Ваше прізвище"
+                            >
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label for="phone">
+                                Номер телефону *
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="phone"
+                                required
+                                placeholder="+380"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="email">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                placeholder="example@email.com"
+                            >
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DELIVERY -->
+
+            <div class="checkout-block">
+
+                <div class="block-number">
+                    02
+                </div>
+
+
+                <div class="block-content">
+
+                    <h2>
+                        Доставка
+                    </h2>
+
+
+                    <div class="form-group">
+
+                        <label for="city">
+                            Місто *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="city"
+                            required
+                            placeholder="Наприклад: Львів"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="delivery-method">
+                            Спосіб доставки *
+                        </label>
+
+                        <select
+                            id="delivery-method"
+                            required
+                        >
+
+                            <option value="">
+                                Оберіть доставку
+                            </option>
+
+                            <option value="nova-poshta">
+                                Нова пошта
+                            </option>
+
+                            <option value="ukrposhta">
+                                Укрпошта
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="warehouse">
+                            Відділення / поштомат *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="warehouse"
+                            required
+                            placeholder="Наприклад: Відділення №10"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PAYMENT -->
+
+            <div class="checkout-block">
+
+                <div class="block-number">
+                    03
+                </div>
+
+
+                <div class="block-content">
+
+                    <h2>
+                        Оплата
+                    </h2>
+
+
+                    <label class="payment-option">
+
+                        <input
+                            type="radio"
+                            name="payment"
+                            value="cash-on-delivery"
+                            checked
+                        >
+
+                        <div>
+
+                            <strong>
+                                Післяплата
+                            </strong>
+
+                            <span>
+                                Оплата при отриманні
+                            </span>
+
+                        </div>
+
+                    </label>
+
+
+
+                    <label class="payment-option">
+
+                        <input
+                            type="radio"
+                            name="payment"
+                            value="online"
+                        >
+
+                        <div>
+
+                            <strong>
+                                Оплата онлайн
+                            </strong>
+
+                            <span>
+                                Банківською карткою
+                            </span>
+
+                        </div>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- COMMENT -->
+
+            <div class="checkout-block">
+
+                <div class="block-number">
+                    04
+                </div>
+
+
+                <div class="block-content">
+
+                    <h2>
+                        Коментар
+                    </h2>
+
+
+                    <div class="form-group">
+
+                        <textarea
+                            id="comment"
+                            rows="5"
+                            placeholder="Побажання до замовлення..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <button
+                type="submit"
+                class="place-order-button"
+            >
+
+                ПІДТВЕРДИТИ ЗАМОВЛЕННЯ
+
+            </button>
+
+
+            <p class="order-note">
+                Натискаючи кнопку, ви підтверджуєте
+                правильність введених даних.
+            </p>
+
+
+        </form>
+
+    </section>
+
+
+
+    <!-- =========================
+         ORDER SUMMARY
+    ========================= -->
+
+    <aside class="order-summary">
+
+
+        <div class="summary-sticky">
+
+
+            <p class="small-title">
+                ВАШЕ ЗАМОВЛЕННЯ
+            </p>
+
+
+            <h2>
+                Кошик
+            </h2>
+
+
+
+            <!-- JavaScript вставить товари -->
+
+            <div
+                class="checkout-items"
+                id="checkout-items"
+            >
+
+                <p class="loading-order">
+                    Завантаження...
+                </p>
+
+            </div>
+
+
+
+            <div class="summary-line">
+
+                <span>
+                    Товари
+                </span>
+
+                <strong id="products-total">
+                    0 грн
+                </strong>
+
+            </div>
+
+
+
+            <div class="summary-line delivery-line">
+
+                <span>
+                    Доставка
+                </span>
+
+                <span>
+                    За тарифами перевізника
+                </span>
+
+            </div>
+
+
+
+            <div class="summary-total">
+
+                <span>
+                    РАЗОМ
+                </span>
+
+                <strong id="checkout-total">
+                    0 грн
+                </strong>
+
+            </div>
+
+
+
+            <div class="secure-order">
+
+                <span>
+                    ◇
+                </span>
+
+                <p>
+                    Ваші контактні дані використовуються
+                    лише для обробки замовлення.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </aside>
+
+
+</main>
+
+
+
+<!-- =========================
+     SUCCESS WINDOW
+========================= -->
+
+<div
+    class="success-overlay"
+    id="success-overlay"
+>
+
+
+    <div class="success-window">
+
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+
+        <p class="small-title">
+            CRYSTAL CHRISTMAS
+        </p>
+
+
+        <h2>
+            Дякуємо за
+            <br>
+            замовлення!
+        </h2>
+
+
+        <p>
+            Ваше замовлення
+        </p>
+
+
+        <strong
+            class="order-number"
+            id="order-number"
+        >
+            #CC-0000
+        </strong>
+
+
+        <p class="success-description">
+
+            Замовлення прийнято.
+            Ми зв'яжемося з вами
+            для підтвердження деталей.
+
+        </p>
+
+
+        <a
+            href="index.html"
+            class="return-button"
+        >
+            ПОВЕРНУТИСЯ В МАГАЗИН
+        </a>
+
+
+    </div>
+
+</div>
+
+
+
+<script src="checkout.js"></script>
+
+</body>
+
+</html>

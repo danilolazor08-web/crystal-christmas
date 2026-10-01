@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="robots"
+        content="noindex, nofollow"
+    >
+
+    <title>
+        Crystal Christmas | Адмін-панель
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="admin.css"
+    >
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="sidebar">
+
+    <!-- LOGO -->
+
+    <div class="admin-logo">
+
+        <span>
+            ADMIN PANEL
+        </span>
+
+        <h1>
+            CRYSTAL
+            <br>
+            CHRISTMAS
+        </h1>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav class="admin-navigation">
+
+        <button
+            class="nav-button active"
+            data-section="dashboard-section"
+            type="button"
+        >
+            ГОЛОВНА
+        </button>
+
+
+        <button
+            class="nav-button"
+            data-section="products-section"
+            type="button"
+        >
+            ТОВАРИ
+        </button>
+
+
+        <button
+            class="nav-button"
+            data-section="add-section"
+            type="button"
+        >
+            + ДОДАТИ ТОВАР
+        </button>
+
+
+        <button
+            class="nav-button"
+            data-section="orders-section"
+            type="button"
+        >
+
+            ЗАМОВЛЕННЯ
+
+            <span
+                class="orders-badge"
+                id="orders-badge"
+            >
+                0
+            </span>
+
+        </button>
+
+
+        <a href="index.html">
+            ← ПЕРЕЙТИ В МАГАЗИН
+        </a>
+
+    </nav>
+
+
+    <!-- BOTTOM -->
+
+    <div class="sidebar-bottom">
+
+        <span>
+            Crystal Christmas
+        </span>
+
+        <p>
+            Store Management
+        </p>
+
+    </div>
+
+</aside>
+
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="admin-main">
+
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <header class="admin-header">
+
+        <div>
+
+            <p class="small-title">
+                CRYSTAL CHRISTMAS
+            </p>
+
+            <h2>
+                Керування магазином
+            </h2>
+
+        </div>
+
+
+        <a
+            href="index.html"
+            class="shop-button"
+        >
+            ВІДКРИТИ МАГАЗИН
+        </a>
+
+    </header>
+
+
+
+    <!-- =================================================
+         DASHBOARD
+    ================================================== -->
+
+    <section
+        class="admin-section active"
+        id="dashboard-section"
+    >
+
+        <div class="section-top">
+
+            <div>
+
+                <p class="small-title">
+                    ОГЛЯД
+                </p>
+
+                <h2>
+                    Crystal Christmas
+                </h2>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STATISTICS -->
+
+        <div class="dashboard-cards">
+
+
+            <!-- PRODUCTS -->
+
+            <div class="dashboard-card">
+
+                <p>
+                    ТОВАРІВ
+                </p>
+
+                <strong
+                    id="dashboard-products"
+                >
+                    0
+                </strong>
+
+                <span>
+                    у каталозі
+                </span>
+
+            </div>
+
+
+
+            <!-- ORDERS -->
+
+            <div class="dashboard-card">
+
+                <p>
+                    ЗАМОВЛЕНЬ
+                </p>
+
+                <strong
+                    id="dashboard-orders"
+                >
+                    0
+                </strong>
+
+                <span>
+                    всього
+                </span>
+
+            </div>
+
+
+
+            <!-- NEW ORDERS -->
+
+            <div class="dashboard-card">
+
+                <p>
+                    НОВИХ
+                </p>
+
+                <strong
+                    id="dashboard-new-orders"
+                >
+                    0
+                </strong>
+
+                <span>
+                    потребують обробки
+                </span>
+
+            </div>
+
+
+
+            <!-- SALES -->
+
+            <div class="dashboard-card">
+
+                <p>
+                    ПРОДАЖІ
+                </p>
+
+                <strong
+                    id="dashboard-sales"
+                >
+                    0 грн
+                </strong>
+
+                <span>
+                    сума замовлень
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DASHBOARD BOTTOM -->
+
+        <div class="dashboard-bottom">
+
+
+            <!-- LAST ORDERS -->
+
+            <div class="dashboard-panel">
+
+                <p class="small-title">
+                    ОСТАННІ ЗАМОВЛЕННЯ
+                </p>
+
+                <h3>
+                    Нові покупки
+                </h3>
+
+
+                <div
+                    id="dashboard-last-orders"
+                >
+
+                    <p class="dashboard-empty">
+                        Замовлень поки немає.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="dashboard-panel">
+
+                <p class="small-title">
+                    ШВИДКІ ДІЇ
+                </p>
+
+                <h3>
+                    Керування
+                </h3>
+
+
+                <button
+                    type="button"
+                    class="dashboard-action"
+                    id="dashboard-add-product"
+                >
+                    + ДОДАТИ НОВИЙ ТОВАР
+                </button>
+
+
+                <button
+                    type="button"
+                    class="dashboard-action"
+                    id="dashboard-open-orders"
+                >
+                    ПЕРЕГЛЯНУТИ ЗАМОВЛЕННЯ
+                </button>
+
+
+                <a
+                    href="index.html"
+                    class="dashboard-action"
+                >
+                    ВІДКРИТИ МАГАЗИН
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         PRODUCTS
+    ================================================== -->
+
+    <section
+        class="admin-section"
+        id="products-section"
+    >
+
+        <div class="section-top">
+
+            <div>
+
+                <p class="small-title">
+                    КАТАЛОГ
+                </p>
+
+                <h2>
+                    Ваші товари
+                </h2>
+
+            </div>
+
+
+            <button
+                class="gold-button"
+                id="go-add-product"
+                type="button"
+            >
+                + ДОДАТИ ТОВАР
+            </button>
+
+        </div>
+
+
+
+        <!-- PRODUCTS WILL APPEAR HERE -->
+
+        <div
+            class="admin-products"
+            id="admin-products"
+        >
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         ADD / EDIT PRODUCT
+    ================================================== -->
+
+    <section
+        class="admin-section"
+        id="add-section"
+    >
+
+        <div class="form-heading">
+
+            <p class="small-title">
+                КАТАЛОГ
+            </p>
+
+            <h2 id="form-title">
+                Додати нову іграшку
+            </h2>
+
+            <p>
+                Додайте фотографію, назву,
+                ціну, категорію та опис товару.
+            </p>
+
+        </div>
+
+
+
+        <!-- PRODUCT FORM -->
+
+        <form
+            class="product-form"
+            id="product-form"
+        >
+
+
+            <!-- IMAGE -->
+
+            <div class="form-block">
+
+                <label class="main-label">
+                    Фотографія товару
+                </label>
+
+
+                <div
+                    class="image-upload"
+                    id="image-upload"
+                >
+
+                    <input
+                        type="file"
+                        id="product-image"
+                        accept="image/jpeg,image/png,image/webp"
+                    >
+
+
+                    <div
+                        class="upload-placeholder"
+                        id="upload-placeholder"
+                    >
+
+                        <div class="upload-icon">
+                            +
+                        </div>
+
+                        <strong>
+                            Вибрати фотографію
+                        </strong>
+
+                        <span>
+                            JPG, PNG або WEBP
+                        </span>
+
+                    </div>
+
+
+                    <img
+                        id="image-preview"
+                        src=""
+                        alt="Попередній перегляд товару"
+                    >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PRODUCT NAME -->
+
+            <div class="form-block">
+
+                <label for="product-name">
+                    Назва іграшки
+                </label>
+
+                <input
+                    type="text"
+                    id="product-name"
+                    placeholder="Наприклад: Солоха"
+                    autocomplete="off"
+                    required
+                >
+
+            </div>
+
+
+
+            <div class="form-row">
+
+
+                <!-- PRICE -->
+
+                <div class="form-block">
+
+                    <label for="product-price">
+                        Ціна
+                    </label>
+
+
+                    <div class="price-input">
+
+                        <input
+                            type="number"
+                            id="product-price"
+                            placeholder="750"
+                            min="1"
+                            step="1"
+                            required
+                        >
+
+                        <span>
+                            грн
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CATEGORY -->
+
+                <div class="form-block">
+
+                    <label for="product-category">
+                        Категорія
+                    </label>
+
+                    <input
+                        type="text"
+                        id="product-category"
+                        placeholder="Українська колекція"
+                        autocomplete="off"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-block">
+
+                <label for="product-description">
+                    Опис
+                </label>
+
+                <textarea
+                    id="product-description"
+                    rows="6"
+                    placeholder="Розкажіть історію цієї прикраси..."
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- STOCK -->
+
+            <div class="form-block">
+
+                <label class="stock-control">
+
+                    <input
+                        type="checkbox"
+                        id="product-stock"
+                        checked
+                    >
+
+                    <span>
+                        Товар є в наявності
+                    </span>
+
+                </label>
+
+            </div>
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="form-buttons">
+
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+                    ЗБЕРЕГТИ ТОВАР
+                </button>
+
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancel-product"
+                >
+                    СКАСУВАТИ
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+
+    <!-- =================================================
+         ORDERS
+    ================================================== -->
+
+    <section
+        class="admin-section"
+        id="orders-section"
+    >
+
+        <div class="section-top">
+
+            <div>
+
+                <p class="small-title">
+                    ПРОДАЖІ
+                </p>
+
+                <h2>
+                    Замовлення
+                </h2>
+
+            </div>
+
+
+            <div class="orders-counter">
+
+                Всього:
+
+                <strong
+                    id="orders-total-count"
+                >
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ORDER FILTERS -->
+
+        <div class="orders-filters">
+
+
+            <button
+                type="button"
+                class="order-filter active"
+                data-status="all"
+            >
+                УСІ
+            </button>
+
+
+            <button
+                type="button"
+                class="order-filter"
+                data-status="Нове"
+            >
+                НОВІ
+            </button>
+
+
+            <button
+                type="button"
+                class="order-filter"
+                data-status="В обробці"
+            >
+                В ОБРОБЦІ
+            </button>
+
+
+            <button
+                type="button"
+                class="order-filter"
+                data-status="Відправлено"
+            >
+                ВІДПРАВЛЕНІ
+            </button>
+
+
+            <button
+                type="button"
+                class="order-filter"
+                data-status="Виконано"
+            >
+                ВИКОНАНІ
+            </button>
+
+        </div>
+
+
+
+        <!-- ORDER LIST -->
+
+        <div
+            class="orders-list"
+            id="orders-list"
+        >
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<!-- =====================================================
+     NOTIFICATION
+===================================================== -->
+
+<div
+    class="notification"
+    id="notification"
+>
+    Збережено
+</div>
+
+
+
+<!-- =====================================================
+     DELETE ORDER MODAL
+===================================================== -->
+
+<div
+    class="admin-modal-overlay"
+    id="delete-order-modal"
+>
+
+    <div class="admin-modal">
+
+
+        <p class="small-title">
+            CRYSTAL CHRISTMAS
+        </p>
+
+
+        <h2>
+            Видалити замовлення?
+        </h2>
+
+
+        <p>
+            Цю дію неможливо буде скасувати.
+        </p>
+
+
+        <div class="admin-modal-buttons">
+
+
+            <button
+                type="button"
+                class="cancel-button"
+                id="cancel-delete-order"
+            >
+                СКАСУВАТИ
+            </button>
+
+
+            <button
+                type="button"
+                class="delete-confirm-button"
+                id="confirm-delete-order"
+            >
+                ВИДАЛИТИ
+            </button>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script src="admin.js"></script>
+
+
+</body>
+</html>
