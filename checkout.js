@@ -5,10 +5,7 @@
 
 // Товари магазину
 
-const products =
-    JSON.parse(
-        localStorage.getItem("crystalChristmasProducts")
-    ) || [];
+const products = [];
 
 
 // Кошик покупця
@@ -119,14 +116,13 @@ function renderOrder() {
 
 
         if (
-            storeProduct &&
-            storeProduct.image
+            (item.image || (storeProduct && storeProduct.image))
         ) {
 
             imageHTML = `
 
                 <img
-                    src="${storeProduct.image}"
+                    src="${item.image || storeProduct.image}"
                     alt="${escapeHTML(item.name)}"
                 >
 
@@ -444,27 +440,14 @@ checkoutForm.addEventListener(
 
         orders.unshift(order);
 
-
-        try {
-
-            localStorage.setItem(
-                "crystalChristmasOrders",
-                JSON.stringify(orders)
-            );
-
-        }
-
-        catch (error) {
-
+        // Зберігаємо замовлення у Firestore — воно з'явиться в адмінці на будь-якому пристрої
+        db.collection("orders").doc(String(order.id)).set({
+            ...order,
+            createdAt: serverTimestamp()
+        }).catch((error) => {
             console.error(error);
-
-            alert(
-                "Не вдалося зберегти замовлення."
-            );
-
-            return;
-
-        }
+            alert("Не вдалося зберегти замовлення. Перевірте Firebase.");
+        });
 
 
         // -------------------------

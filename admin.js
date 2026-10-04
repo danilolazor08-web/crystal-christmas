@@ -7,15 +7,9 @@
 // 1. DATA
 // =====================================================
 
-let products =
-    JSON.parse(
-        localStorage.getItem("crystalChristmasProducts")
-    ) || [];
+let products = [];
 
-let orders =
-    JSON.parse(
-        localStorage.getItem("crystalChristmasOrders")
-    ) || [];
+let orders = [];
 
 let editingProductId = null;
 let selectedImage = "";
@@ -429,26 +423,23 @@ productForm.addEventListener("submit", function(event) {
 // =====================================================
 
 function saveProducts() {
-
-    try {
-
-        localStorage.setItem(
-            "crystalChristmasProducts",
-            JSON.stringify(products)
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Не вдалося зберегти товар. Спробуйте використати менше фото або менший файл."
-        );
-
-    }
-
+    products.forEach(product => {
+        db.collection("products")
+            .doc(String(product.id))
+            .set({
+                name: product.name || "",
+                price: Number(product.price) || 0,
+                category: product.category || "",
+                description: product.description || "",
+                inStock: Boolean(product.inStock),
+                image: product.image || "",
+                updatedAt: serverTimestamp()
+            })
+            .catch(error => {
+                console.error(error);
+                alert("Не вдалося зберегти товар у Firebase.");
+            });
+    });
 }
 
 
@@ -718,6 +709,7 @@ function deleteProduct(id) {
                 Number(id)
         );
 
+    db.collection("products").doc(String(id)).delete().catch(console.error);
 
     saveProducts();
 
@@ -799,14 +791,7 @@ cancelProduct.addEventListener(
 // =====================================================
 
 function loadOrders() {
-
-    orders =
-        JSON.parse(
-            localStorage.getItem(
-                "crystalChristmasOrders"
-            )
-        ) || [];
-
+    // Дані приходять автоматично з Firestore.
 }
 
 
@@ -815,12 +800,10 @@ function loadOrders() {
 // =====================================================
 
 function saveOrders() {
-
-    localStorage.setItem(
-        "crystalChristmasOrders",
-        JSON.stringify(orders)
-    );
-
+    orders.forEach(order => {
+        if (!order.id) return;
+        db.collection("orders").doc(String(order.id)).set(order, { merge: true }).catch(console.error);
+    });
 }
 
 
@@ -1353,6 +1336,8 @@ confirmDeleteOrder.addEventListener(
         }
 
 
+        const deletedOrderId = orderToDelete;
+
         orders =
             orders.filter(
                 order =>
@@ -1360,6 +1345,7 @@ confirmDeleteOrder.addEventListener(
                     Number(orderToDelete)
             );
 
+        db.collection("orders").doc(String(deletedOrderId)).delete().catch(console.error);
 
         saveOrders();
 
@@ -1649,42 +1635,36 @@ function escapeHTML(text) {
 
 
 // =====================================================
-// 26. REFRESH DATA WHEN RETURNING TO ADMIN
+// 26. FIRESTORE REALTIME
 // =====================================================
 
-window.addEventListener(
-    "pageshow",
-    function() {
+db.collection("products").onSnapshot((snapshot) => {
+    products = snapshot.docs.map(doc => ({ id: Number(doc.id) || doc.id, ...doc.data() }));
+    renderProducts();
+    updateDashboard();
+}, error => console.error("Products Firestore:", error));
 
-        products =
-            JSON.parse(
-                localStorage.getItem(
-                    "crystalChristmasProducts"
-                )
-            ) || [];
+db.collection("orders").onSnapshot((snapshot) => {
+    orders = snapshot.docs.map(doc => ({ id: Number(doc.id) || doc.id, ...doc.data() }));
+    orders.sort((a, b) => Number(b.id) - Number(a.id));
+    renderOrders();
+    updateDashboard();
+}, error => console.error("Orders Firestore:", error));
 
-
-        loadOrders();
-
-
-        renderProducts();
-
-        renderOrders();
-
-        updateDashboard();
-
-    }
-);
-
-
-// =====================================================
-// 27. START
-// =====================================================
-
-renderProducts();
-
-loadOrders();
-
-renderOrders();
-
-updateDashboard();
+// Переносимо старі локальні товари у Firestore один раз, якщо база ще порожня.
+(async function migrateLocalProductsOnce() {
+    try {
+        const snap = await db.collection("products").limit(1).get();
+        const localProducts = JSON.parse(localStorage.getItem("crystalChristmasProducts")) || [];
+        if (snap.empty && localProducts.length) {
+            for (const product of localProducts) {
+                await db.collection("products").doc(String(product.id || Date.now())).set({
+                    name: product.name || "", price: Number(product.price) || 0,
+                    category: product.category || "", description: product.description || "",
+                    inStock: Boolean(product.inStock), image: product.image || "",
+                    updatedAt: serverTimestamp()
+                });
+            }
+        }
+    } catch (error) { console.error("Migration:", error); }
+})();

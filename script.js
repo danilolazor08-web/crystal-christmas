@@ -8,10 +8,7 @@
 // 1. ЗАВАНТАЖУЄМО ТОВАРИ З АДМІНКИ
 // =====================================================
 
-let products =
-    JSON.parse(
-        localStorage.getItem("crystalChristmasProducts")
-    ) || [];
+let products = [];
 
 
 // =====================================================
@@ -832,6 +829,16 @@ window.addEventListener(
 // 17. START
 // =====================================================
 
-renderProducts();
+// FIRESTORE — товари однакові на всіх пристроях
+db.collection("products").onSnapshot((snapshot) => {
+    products = snapshot.docs.map(doc => ({
+        id: Number(doc.id) || doc.id,
+        ...doc.data()
+    }));
+    renderProducts();
+}, (error) => {
+    console.error("Помилка завантаження товарів:", error);
+    productsContainer.innerHTML = `<div class="catalog-empty"><h3>Не вдалося завантажити колекцію</h3><p>Перевірте підключення до Firebase.</p></div>`;
+});
 
 updateCart();
