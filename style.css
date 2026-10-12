@@ -645,9 +645,9 @@ body {
 
     text-align: center;
 
-    background: #07182D;
+    background: #D4AF67;
 
-    color: #F7F4ED;
+    color: #07182D;
 }
 
 .contacts .eyebrow {
@@ -673,7 +673,7 @@ body {
 
     line-height: 1.8;
 
-    color: rgba(255,255,255,0.75);
+    color: #E1EAF4;
 }
 
 .contact-links {
@@ -685,7 +685,7 @@ body {
 }
 
 .contact-links a {
-    color: #E8CC8A;
+    color: #FFFFFF;
 
     text-decoration: none;
 
@@ -713,7 +713,7 @@ body {
     justify-content: space-between;
     align-items: center;
 
-    background: #07182D;
+    background: #030B15;
 
     color: white;
 
@@ -1164,3 +1164,20 @@ body {
     }
 
 }
+/* Final contacts section override */
+#contacts.contacts { background: #07182D !important; color: #FFFFFF !important; }
+#contacts.contacts h2, #contacts.contacts .contact-links a { color: #FFFFFF !important; }
+#contacts.contacts .contacts-description { color: #E1EAF4 !important; }
+#contacts.contacts .eyebrow { color: #D4AF67 !important; }
+
+/* Unified blue background across all closing sections, including mobile. */
+html body #about.about,
+html body #contacts.contacts,
+html body footer.footer {
+    background: #123B78 !important;
+    background-image: none !important;
+    color: #FFFFFF !important;
+}
+html body footer.footer { border-top: 0 !important; }
+html body #contacts.contacts h2,
+html body #contacts.contacts .contact-links a { color: #FFFFFF !important; }
