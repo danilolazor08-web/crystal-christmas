@@ -645,13 +645,13 @@ body {
 
     text-align: center;
 
-    background: #D4AF67;
+    background: #07182D;
 
-    color: #07182D;
+    color: #F7F4ED;
 }
 
 .contacts .eyebrow {
-    color: #70562B;
+    color: #D4AF67;
 }
 
 .contacts h2 {
@@ -673,7 +673,7 @@ body {
 
     line-height: 1.8;
 
-    color: #56482E;
+    color: rgba(255,255,255,0.75);
 }
 
 .contact-links {
@@ -685,7 +685,7 @@ body {
 }
 
 .contact-links a {
-    color: #07182D;
+    color: #E8CC8A;
 
     text-decoration: none;
 
@@ -695,7 +695,7 @@ body {
 
     letter-spacing: 3px;
 
-    border-bottom: 1px solid #07182D;
+    border-bottom: 1px solid #D4AF67;
 
     padding-bottom: 5px;
 }
@@ -713,7 +713,7 @@ body {
     justify-content: space-between;
     align-items: center;
 
-    background: #030B15;
+    background: #07182D;
 
     color: white;
 
