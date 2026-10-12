@@ -20,7 +20,7 @@
 
     <link
         rel="stylesheet"
-        href="admin.css"
+        href="admin.css?v=gallery-20261012"
     >
 </head>
 
@@ -455,7 +455,7 @@
             <div class="form-block">
 
                 <label class="main-label">
-                    Фотографія товару
+                    Фотографії товару (можна вибрати кілька)
                 </label>
 
 
@@ -467,6 +467,7 @@
                     <input
                         type="file"
                         id="product-image"
+                        multiple
                         accept="image/jpeg,image/png,image/webp"
                     >
 
@@ -481,11 +482,11 @@
                         </div>
 
                         <strong>
-                            Вибрати фотографію
+                            Додати фотографії
                         </strong>
 
                         <span>
-                            JPG, PNG або WEBP
+                            JPG, PNG або WEBP · до 8 МБ кожна
                         </span>
 
                     </div>
@@ -497,6 +498,7 @@
                         alt="Попередній перегляд товару"
                     >
 
+                    <div id="gallery-preview" class="gallery-preview"></div>
                 </div>
 
             </div>
@@ -830,8 +832,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="firebase.js"></script>
-<script src="admin.js"></script>
+<script src="admin.js?v=gallery-20261012"></script>
 
 
 </body>

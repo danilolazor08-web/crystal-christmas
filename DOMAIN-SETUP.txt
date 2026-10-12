@@ -1,0 +1,15 @@
+Crystal Christmas — підключення crystalchristmas.com.ua
+
+1. Зареєструйте домен crystalchristmas.com.ua у реєстратора (домен НЕ куплено цим ZIP).
+2. У GitHub: Settings → Pages → Custom domain → crystalchristmas.com.ua.
+3. У DNS реєстратора створіть A записи для кореня домену:
+185.199.108.153
+185.199.109.153
+185.199.110.153
+185.199.111.153
+4. Після налаштування DNS увімкніть Enforce HTTPS у GitHub Pages.
+5. Додайте crystalchristmas.com.ua до Firebase Authentication → Settings → Authorized domains, якщо потрібен вхід в адмінку.
+
+Фото: Firebase Console → Build → Storage → Get started. Налаштуйте правила так, щоб запис у products/ був дозволений лише авторизованим адміністраторам. Не відкривайте запис для всіх користувачів. Увімкнення Storage може вимагати платіжний план Firebase.
+
+Нові фото з адмінки завантажуються у Firebase Storage; у Firestore зберігаються лише URL. Старі товари з полем image продовжують працювати.
