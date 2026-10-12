@@ -1181,3 +1181,41 @@ html body footer.footer {
 html body footer.footer { border-top: 0 !important; }
 html body #contacts.contacts h2,
 html body #contacts.contacts .contact-links a { color: #FFFFFF !important; }
+
+
+/* CRYSTAL CHRISTMAS: ONE SOLID BLUE ON ALL MAIN SECTIONS */
+:root { --crystal-blue: #123B78; }
+html, body, main,
+body .header, body .hero, body .collection,
+body #about.about, body #contacts.contacts, body footer.footer {
+    background: var(--crystal-blue) !important;
+    background-color: var(--crystal-blue) !important;
+    background-image: none !important;
+}
+body .header, body footer.footer { border-color: transparent !important; }
+body .section-heading h2, body .section-heading > p:last-child { color: #FFFFFF !important; }
+body .section-heading .eyebrow { color: #D4AF67 !important; }
+body #about.about, body #contacts.contacts, body footer.footer { color: #FFFFFF !important; }
+
+
+/* CRYSTAL CHRISTMAS — FINAL CONSISTENT BLUE GRADIENT */
+:root {
+    --crystal-blue-gradient: linear-gradient(135deg, #07182D 0%, #123B78 55%, #245BA3 100%);
+}
+html body,
+html body main,
+html body .header,
+html body .hero,
+html body .collection,
+html body #about.about,
+html body #contacts.contacts,
+html body footer.footer {
+    background: var(--crystal-blue-gradient) !important;
+    background-image: var(--crystal-blue-gradient) !important;
+    background-color: #123B78 !important;
+}
+html body .header,
+html body footer.footer { border-color: transparent !important; }
+html body #about.about,
+html body #contacts.contacts,
+html body footer.footer { color: #FFFFFF !important; }
