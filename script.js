@@ -281,6 +281,7 @@ function renderProducts() {
 
 
     connectAddButtons();
+    connectProductDetails();
 
 }
 
@@ -842,3 +843,76 @@ db.collection("products").onSnapshot((snapshot) => {
 });
 
 updateCart();
+
+/* PRODUCT DETAILS: click a product card to open a compact photo preview */
+function connectProductDetails() {
+    document.querySelectorAll(".product").forEach((card, index) => {
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+        card.setAttribute("aria-label", "Переглянути товар " + (products[index]?.name || ""));
+        const open = (event) => {
+            if (event.target.closest(".add-cart")) return;
+            showProductDetails(products[index]);
+        };
+        card.addEventListener("click", open);
+        card.addEventListener("keydown", (event) => {
+            if ((event.key === "Enter" || event.key === " ") && !event.target.closest(".add-cart")) {
+                event.preventDefault();
+                open(event);
+            }
+        });
+    });
+}
+function showProductDetails(product) {
+    if (!product) return;
+    document.getElementById("crystal-product-modal")?.remove();
+    const overlay = document.createElement("div");
+    overlay.id = "crystal-product-modal";
+    overlay.className = "crystal-product-overlay";
+    const panel = document.createElement("div");
+    panel.className = "crystal-product-panel";
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-modal", "true");
+    const close = document.createElement("button");
+    close.className = "crystal-product-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.setAttribute("aria-label", "Закрити");
+    const picture = document.createElement("div");
+    picture.className = "crystal-product-picture";
+    if (product.image) {
+        const img = document.createElement("img");
+        img.src = product.image;
+        img.alt = product.name || "Фото товару";
+        picture.appendChild(img);
+    } else {
+        picture.textContent = "CRYSTAL CHRISTMAS";
+    }
+    const info = document.createElement("div");
+    info.className = "crystal-product-details";
+    for (const [tag, value] of [
+        ["small", product.category || "CRYSTAL CHRISTMAS"],
+        ["h2", product.name || "Прикраса"],
+        ["p", product.description || "Скляна різдвяна прикраса ручної роботи."],
+        ["strong", Number(product.price || 0).toLocaleString("uk-UA") + " грн"]
+    ]) {
+        const el = document.createElement(tag);
+        el.textContent = value;
+        info.appendChild(el);
+    }
+    panel.append(close,picture,info);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const dismiss = () => {
+        overlay.remove();
+        document.body.style.overflow = previousOverflow;
+        document.removeEventListener("keydown", escapeHandler);
+    };
+    const escapeHandler = (event) => { if (event.key === "Escape") dismiss(); };
+    close.addEventListener("click",dismiss);
+    overlay.addEventListener("click",(event)=>{if(event.target===overlay)dismiss();});
+    document.addEventListener("keydown",escapeHandler);
+    close.focus();
+}

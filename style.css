@@ -1254,3 +1254,20 @@ html body .section-heading > p:last-child,
 html body #contacts.contacts .contacts-description { color: #DCE7F4 !important; }
 html body .hero::before,
 html body .hero::after { pointer-events: none; }
+
+/* Compact product images and clickable product detail view */
+.product { cursor: pointer; }
+.product:focus-visible { outline: 3px solid #d4af67; outline-offset: 3px; }
+.product-image { height: 270px !important; }
+.product-image img { width: 100%; height: 100%; object-fit: contain; display: block; padding: 12px; }
+.crystal-product-overlay { position: fixed; inset: 0; z-index: 10000; background: rgba(1,9,21,.83); display: flex; align-items: center; justify-content: center; padding: 18px; overflow-y: auto; }
+.crystal-product-panel { width: min(100%, 680px); max-height: calc(100vh - 36px); overflow-y: auto; position: relative; background: #fff; color: #07182d; padding: 26px; box-shadow: 0 25px 70px rgba(0,0,0,.35); }
+.crystal-product-close { position: absolute; top: 10px; right: 14px; font-size: 32px; border: 0; background: #07182d; color: white; width: 42px; height: 42px; cursor: pointer; z-index: 1; }
+.crystal-product-picture { height: min(43vh, 290px); background: #f5f7fa; display: flex; align-items: center; justify-content: center; color: #a3844d; font-size: 11px; letter-spacing: 3px; }
+.crystal-product-picture img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.crystal-product-details { padding: 20px 4px 2px; display: grid; gap: 13px; }
+.crystal-product-details small { color: #a3844d; letter-spacing: 2px; text-transform: uppercase; }
+.crystal-product-details h2 { font: normal clamp(24px, 4vw, 36px) Georgia, serif; }
+.crystal-product-details p { color: #526071; line-height: 1.7; }
+.crystal-product-details strong { font-size: 22px; }
+@media (max-width: 600px) { .product-image { height: 230px !important; } .crystal-product-panel { padding: 16px; } .crystal-product-picture { height: 240px; } }
