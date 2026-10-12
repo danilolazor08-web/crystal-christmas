@@ -1219,3 +1219,38 @@ html body footer.footer { border-color: transparent !important; }
 html body #about.about,
 html body #contacts.contacts,
 html body footer.footer { color: #FFFFFF !important; }
+
+/* FINAL: ONE CONTINUOUS DARK-BLUE BACKGROUND MATCHING THE FIRST SLIDE.
+   Background belongs to BODY; sections are transparent so no seams appear. */
+html { background: #04101F !important; }
+html body {
+    background: radial-gradient(circle at 80% 40%, rgba(38,80,125,.55), transparent 35%),
+                linear-gradient(120deg, #04101F 0%, #07182D 45%, #0D2A4A 100%) !important;
+    background-attachment: fixed !important;
+    color: #fff;
+}
+html body main,
+html body .hero,
+html body .collection,
+html body #about.about,
+html body #contacts.contacts,
+html body footer.footer {
+    background: transparent !important;
+    background-image: none !important;
+    background-color: transparent !important;
+}
+html body .header {
+    background: rgba(7,24,45,.94) !important;
+    background-image: none !important;
+}
+html body .section-heading h2,
+html body .section-heading > p:last-child,
+html body #about.about,
+html body #contacts.contacts,
+html body #contacts.contacts h2,
+html body #contacts.contacts .contact-links a,
+html body footer.footer { color: #fff !important; }
+html body .section-heading > p:last-child,
+html body #contacts.contacts .contacts-description { color: #DCE7F4 !important; }
+html body .hero::before,
+html body .hero::after { pointer-events: none; }
