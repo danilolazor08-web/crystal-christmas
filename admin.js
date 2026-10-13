@@ -224,105 +224,199 @@ dashboardOpenOrders.addEventListener("click", function() {
 // 5. PRODUCT IMAGE
 // =====================================================
 
-// Multiple photos are stored in Firebase Storage, not in Firestore documents.
-let galleryImages = [];
-let pendingPhotoFiles = [];
-const galleryPreview = document.getElementById("gallery-preview");
-function drawGalleryPreview() {
-    galleryPreview.innerHTML = "";
-    galleryImages.forEach((url, index) => addGalleryThumb(url, index, false));
-    pendingPhotoFiles.forEach((file, index) => {
-        const url = URL.createObjectURL(file);
-        addGalleryThumb(url, index, true);
-    });
-    uploadPlaceholder.style.display = galleryImages.length || pendingPhotoFiles.length ? "none" : "flex";
-}
-function addGalleryThumb(url, index, pending) {
-    const box = document.createElement("div");
-    box.className = "gallery-thumb";
-    const img = document.createElement("img");
-    img.src = url;
-    img.alt = "Фото товару";
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.textContent = "×";
-    remove.title = "Прибрати фото";
-    remove.onclick = () => {
-        if (pending) pendingPhotoFiles.splice(index, 1);
-        else galleryImages.splice(index, 1);
-        drawGalleryPreview();
+productImage.addEventListener("change", function(event) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+        return;
+    }
+
+
+    if (!file.type.startsWith("image/")) {
+
+        alert("Оберіть фотографію.");
+
+        productImage.value = "";
+
+        return;
+    }
+
+
+    if (file.size > 3 * 1024 * 1024) {
+
+        alert(
+            "Фото завелике. Для локальної версії використайте фото до 3 МБ."
+        );
+
+        productImage.value = "";
+
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = function(event) {
+
+        selectedImage =
+            event.target.result;
+
+
+        imagePreview.src =
+            selectedImage;
+
+
+        imagePreview.style.display =
+            "block";
+
+
+        uploadPlaceholder.style.display =
+            "none";
+
     };
-    box.append(img, remove);
-    galleryPreview.appendChild(box);
-}
-productImage.addEventListener("change", event => {
-    const incoming = Array.from(event.target.files || []);
-    for (const file of incoming) {
-        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-            alert("Дозволені JPG, PNG або WEBP."); continue;
-        }
-        if (file.size > 8 * 1024 * 1024) {
-            alert("Максимальний розмір одного фото — 8 МБ."); continue;
-        }
-        pendingPhotoFiles.push(file);
-    }
-    event.target.value = "";
-    drawGalleryPreview();
+
+
+    reader.readAsDataURL(file);
+
 });
-async function uploadGalleryFiles(productId) {
-    if (!pendingPhotoFiles.length) return [];
-    if (!firebase.storage) throw new Error("Firebase Storage не підключений");
-    const storage = firebase.storage();
-    const urls = [];
-    for (const file of pendingPhotoFiles) {
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `products/${productId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`;
-        const ref = storage.ref().child(path);
-        await ref.put(file, { contentType: file.type });
-        urls.push(await ref.getDownloadURL());
-    }
-    return urls;
-}
+
 
 // =====================================================
 // 6. SAVE PRODUCT
 // =====================================================
 
-productForm.addEventListener("submit", async function(event) {
+productForm.addEventListener("submit", function(event) {
+
     event.preventDefault();
-    const name = productName.value.trim();
-    const price = Number(productPrice.value);
-    const category = productCategory.value.trim();
-    const description = productDescription.value.trim();
-    const inStock = productStock.checked;
-    if (!name || !Number.isFinite(price) || price <= 0 || !category) {
-        alert("Заповніть назву, категорію та правильну ціну."); return;
+
+
+    const name =
+        productName.value.trim();
+
+    const price =
+        Number(productPrice.value);
+
+    const category =
+        productCategory.value.trim();
+
+    const description =
+        productDescription.value.trim();
+
+    const inStock =
+        productStock.checked;
+
+
+    if (!name) {
+
+        alert("Введіть назву товару.");
+
+        return;
     }
-    const id = editingProductId !== null ? editingProductId : Date.now();
-    const saveButton = productForm.querySelector('[type="submit"]');
-    if (saveButton) saveButton.disabled = true;
-    try {
-        const uploaded = await uploadGalleryFiles(id);
-        const images = [...galleryImages, ...uploaded];
-        const product = { id, name, price, category, description, inStock, images, image: images[0] || "" };
-        // Wait for the actual Firestore write before reporting success.
-        await db.collection("products").doc(String(id)).set({
-            name, price, category, description, inStock,
-            images, image: product.image, updatedAt: serverTimestamp()
-        });
-        const index = products.findIndex(p => String(p.id) === String(id));
-        if (index >= 0) products[index] = product;
-        else products.push(product);
-        renderProducts(); updateDashboard(); resetProductForm();
-        showSection("products-section");
-        showNotification("Товар і фотографії збережено");
-    } catch (error) {
-        console.error("Не вдалося зберегти товар", error);
-        alert("Помилка збереження: " + (error.message || error) + ". Перевірте Firebase Storage і правила доступу.");
-    } finally {
-        if (saveButton) saveButton.disabled = false;
+
+
+    if (!price || price <= 0) {
+
+        alert("Введіть правильну ціну.");
+
+        return;
     }
+
+
+    if (!category) {
+
+        alert("Введіть категорію.");
+
+        return;
+    }
+
+
+    // EDIT
+
+    if (editingProductId !== null) {
+
+        const index =
+            products.findIndex(
+                product =>
+                    Number(product.id) ===
+                    Number(editingProductId)
+            );
+
+
+        if (index !== -1) {
+
+            products[index] = {
+
+                ...products[index],
+
+                name,
+                price,
+                category,
+                description,
+                inStock,
+
+                image:
+                    selectedImage ||
+                    products[index].image ||
+                    ""
+
+            };
+
+        }
+
+
+        showNotification(
+            "Товар оновлено"
+        );
+
+    }
+
+    // NEW PRODUCT
+
+    else {
+
+        const newProduct = {
+
+            id: Date.now(),
+
+            name,
+            price,
+            category,
+            description,
+            inStock,
+
+            image:
+                selectedImage || ""
+
+        };
+
+
+        products.push(newProduct);
+
+
+        showNotification(
+            "Товар додано"
+        );
+
+    }
+
+
+    saveProducts();
+
+    renderProducts();
+
+    updateDashboard();
+
+    resetProductForm();
+
+    showSection("products-section");
+
 });
+
 
 // =====================================================
 // 7. SAVE PRODUCTS
@@ -339,7 +433,6 @@ function saveProducts() {
                 description: product.description || "",
                 inStock: Boolean(product.inStock),
                 image: product.image || "",
-                images: product.images || (product.image ? [product.image] : []),
                 updatedAt: serverTimestamp()
             })
             .catch(error => {
@@ -540,10 +633,8 @@ function editProduct(id) {
         Boolean(product.inStock);
 
 
-    galleryImages = Array.isArray(product.images) && product.images.length ? [...product.images] : (product.image ? [product.image] : []);
-    pendingPhotoFiles = [];
-    drawGalleryPreview();
-    selectedImage = product.image || "";
+    selectedImage =
+        product.image || "";
 
 
     if (selectedImage) {
@@ -639,9 +730,6 @@ function deleteProduct(id) {
 // =====================================================
 
 function resetProductForm() {
-    galleryImages = [];
-    pendingPhotoFiles = [];
-    drawGalleryPreview();
 
     productForm.reset();
 
