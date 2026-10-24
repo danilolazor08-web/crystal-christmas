@@ -1,0 +1,12 @@
+CRYSTAL CHRISTMAS — ЯК ВСТАНОВИТИ
+
+1. На GitHub збережи резервну копію: Code -> Download ZIP.
+2. Відкрий репозиторій crystal-christmas -> Add file -> Upload files.
+3. Завантаж ВСІ файли з цього ZIP у корінь репозиторію (не сам ZIP).
+4. Commit changes.
+5. Settings -> Pages: main / (root), Custom domain порожнє.
+6. Відкрий https://danilolazor08-web.github.io/crystal-christmas/
+
+ВАЖЛИВО: не відновлюй старий CNAME, поки власний домен не налаштовано.
+Кілька фото з адмінки потребують увімкненого Firebase Storage і захищених правил.
+Товари/замовлення у Firestore залишаються в базі. Перевір роботу після завантаження.
