@@ -1337,10 +1337,10 @@ html body .crystal-product-picture img {
 
 /* Наша історія — узгоджено з оригінальним темно-синім оформленням */
 html { scroll-behavior: smooth; }
-body #story.brand-story { background: #123B78 !important; color: #fff; padding: 88px 24px; }
+html body #story.brand-story { background: transparent !important; background-image: none !important; background-color: transparent !important; color: #fff; padding: 88px 24px; }
 .brand-story-inner { max-width: 850px; margin: 0 auto; }
 .brand-story .eyebrow { color: #D4AF67; letter-spacing: .18em; text-transform: uppercase; }
-.brand-story h2 { color: #fff; font-size: clamp(2rem, 4vw, 3.2rem); margin: 12px 0 30px; }
+.brand-story h2 { color: #fff; font-family: Georgia, serif; font-weight: 400; font-size: clamp(2rem, 4vw, 3.2rem); margin: 12px 0 30px; }
 .brand-story-text p { color: #E1EAF4; font-size: clamp(1rem, 1.5vw, 1.12rem); line-height: 1.85; margin: 0 0 20px; }
 .brand-story-text strong { color: #fff; }
 .brand-story-text .brand-story-finale { margin-top: 32px; font-size: clamp(1.2rem, 2vw, 1.5rem); }
