@@ -21,7 +21,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=gallery-20261012"
+        href="style.css?v=search-20261028"
     >
 
 <style id="crystal-one-solid-blue">
@@ -190,6 +190,15 @@ body footer.footer { border-top: 0 !important; }
     </div>
 
 
+
+    <div class="catalog-search" role="search">
+        <label for="product-search">ПОШУК У КОЛЕКЦІЇ</label>
+        <div class="catalog-search-field">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+            <input id="product-search" type="search" placeholder="Введіть назву іграшки..." autocomplete="off" aria-controls="products" />
+        </div>
+        <p id="search-results-status" class="search-results-status" role="status" aria-live="polite"></p>
+    </div>
 
     <!--
         СЮДИ JAVASCRIPT
@@ -434,7 +443,7 @@ body footer.footer { border-top: 0 !important; }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="firebase.js"></script>
-<script src="script.js?v=gallery-20261012"></script>
+<script src="script.js?v=search-20261028"></script>
 
 
 </body>

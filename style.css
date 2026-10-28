@@ -1346,3 +1346,15 @@ html body #story.brand-story { background: transparent !important; background-im
 .brand-story-text .brand-story-finale { margin-top: 32px; font-size: clamp(1.2rem, 2vw, 1.5rem); }
 .brand-story-finale strong { color: #D4AF67; }
 @media (max-width: 600px) { body #story.brand-story { padding: 60px 20px; } }
+
+/* Пошук товарів — у кольорах оригінального Crystal Christmas */
+.catalog-search { max-width: 620px; margin: -24px 0 38px; }
+.catalog-search label { display: block; margin-bottom: 12px; color: #D4AF67; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; }
+.catalog-search-field { display: flex; align-items: center; gap: 13px; min-height: 56px; padding: 0 17px; border: 1px solid rgba(212,175,103,.65); background: rgba(7,24,45,.15); transition: border-color .2s, box-shadow .2s; }
+.catalog-search-field:focus-within { border-color: #E8CC8A; box-shadow: 0 0 0 2px rgba(212,175,103,.15); }
+.catalog-search-field svg { flex: 0 0 21px; width: 21px; height: 21px; color: #D4AF67; }
+.catalog-search-field input { min-width: 0; width: 100%; height: 54px; border: 0; outline: 0; background: transparent; color: #fff; font: 14px Arial,Helvetica,sans-serif; }
+.catalog-search-field input::placeholder { color: rgba(255,255,255,.65); }
+.catalog-search-field input::-webkit-search-cancel-button { cursor: pointer; }
+.search-results-status { min-height: 20px; margin-top: 9px; font-size: 12px; color: rgba(255,255,255,.78); }
+@media(max-width: 600px) { .catalog-search { margin: -10px 0 28px; } }
