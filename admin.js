@@ -314,25 +314,40 @@ productImage.addEventListener("change", event => {
     event.target.value = "";
     drawGalleryPreview();
 });
-async function uploadGalleryFiles(productId) {
-    if (!pendingPhotoFiles.length) return [];
-    if (!firebase.storage) throw new Error("Firebase Storage не підключений");
-    const storage = firebase.storage();
-    const urls = [];
+// Keep photos inside the Firestore product document: no paid Storage bucket required.
+function compressPhoto(file, maxSide = 900, quality = 0.72) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+            try {
+                const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+                canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/jpeg", quality));
+            } catch (error) { reject(error); }
+            finally { URL.revokeObjectURL(objectUrl); }
+        };
+        img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Не вдалося прочитати фото.")); };
+        img.src = objectUrl;
+    });
+}
+async function uploadGalleryFiles() {
+    const result = [];
     for (const file of pendingPhotoFiles) {
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `products/${productId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`;
-        const ref = storage.ref().child(path);
-        const uploadTask = ref.put(file, { contentType: file.type });
-        const timeout = setTimeout(() => uploadTask.cancel(), 45000);
-        try {
-            await uploadTask;
-            urls.push(await ref.getDownloadURL());
-        } finally {
-            clearTimeout(timeout);
+        let encoded;
+        for (const side of [900, 700, 500, 360]) {
+            encoded = await compressPhoto(file, side, 0.68);
+            if (encoded.length < 150000) break;
         }
+        result.push(encoded);
     }
-    return urls;
+    return result;
 }
 
 // =====================================================
@@ -359,6 +374,10 @@ productForm.addEventListener("submit", async function(event) {
     try {
         const uploaded = await uploadGalleryFiles(id);
         const images = [...galleryImages, ...uploaded];
+        // Firestore documents have a 1 MiB limit; reserve space for other fields.
+        if (JSON.stringify(images).length > 800000) {
+            throw new Error("Забагато фотографій для одного товару. Зменште їх кількість або розмір.");
+        }
         const product = { id, name, price, category, description, inStock, images, image: images[0] || "" };
         // Wait for the actual Firestore write before reporting success.
         await Promise.race([
@@ -376,7 +395,7 @@ productForm.addEventListener("submit", async function(event) {
         showNotification("Товар і фотографії збережено");
     } catch (error) {
         console.error("Не вдалося зберегти товар", error);
-        alert("Помилка збереження: " + (error.message || error) + ". Перевірте Firebase Storage і правила доступу.");
+        alert("Помилка збереження: " + (error.message || error) + ". Перевірте вхід адміністратора та правила Firestore.");
     } finally {
         if (saveButton) {
             saveButton.disabled = false;
@@ -1621,11 +1640,16 @@ db.collection("products").onSnapshot((snapshot) => {
     updateDashboard();
 }, error => console.error("Products Firestore:", error));
 
-db.collection("orders").onSnapshot((snapshot) => {
+let unsubscribeOrders = null;
+firebase.auth().onAuthStateChanged(user => {
+    if (unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
+    if (!user || user.uid !== ADMIN_UID) { orders = []; renderOrders(); updateDashboard(); return; }
+    unsubscribeOrders = db.collection("orders").onSnapshot((snapshot) => {
     orders = snapshot.docs.map(doc => ({ id: Number(doc.id) || doc.id, ...doc.data() }));
     orders.sort((a, b) => Number(b.id) - Number(a.id));
     renderOrders();
     updateDashboard();
-}, error => console.error("Orders Firestore:", error));
+}, error => { console.error("Orders Firestore:", error); showNotification("Помилка читання замовлень: " + error.message); });
+});
 
 // Automatic localStorage migration disabled to protect existing products.
