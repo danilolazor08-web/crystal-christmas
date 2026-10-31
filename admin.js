@@ -1,3 +1,48 @@
+
+// Firebase sign-in: Firestore writes are allowed only for this account.
+const ADMIN_UID = "v69rs6QQh8QI4YbFb3sHlqmKQdj2";
+const adminAuthGate = document.getElementById("admin-auth-gate");
+const adminLoginForm = document.getElementById("admin-login-form");
+const adminLoginError = document.getElementById("admin-login-error");
+let adminAuthorized = false;
+
+firebase.auth().onAuthStateChanged(user => {
+    adminAuthorized = !!user && user.uid === ADMIN_UID;
+    adminAuthGate.style.display = adminAuthorized ? "none" : "flex";
+    if (user && !adminAuthorized) {
+        adminLoginError.textContent = "Цей обліковий запис не має прав адміністратора.";
+    } else if (adminAuthorized) {
+        adminLoginError.textContent = "";
+    }
+});
+
+adminLoginForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = document.getElementById("admin-login-submit");
+    button.disabled = true;
+    button.textContent = "ВХІД...";
+    adminLoginError.textContent = "";
+    try {
+        const credential = await firebase.auth().signInWithEmailAndPassword(
+            document.getElementById("admin-login-email").value.trim(),
+            document.getElementById("admin-login-password").value
+        );
+        if (credential.user.uid !== ADMIN_UID) {
+            await firebase.auth().signOut();
+            throw new Error("Цей користувач не є адміністратором магазину.");
+        }
+        document.getElementById("admin-login-password").value = "";
+    } catch (error) {
+        adminLoginError.textContent = error.code === "auth/invalid-credential" || error.code === "auth/wrong-password"
+            ? "Неправильний email або пароль." : (error.message || "Не вдалося увійти.");
+    } finally {
+        button.disabled = false;
+        button.textContent = "УВІЙТИ";
+    }
+});
+
+document.getElementById("logout-button").addEventListener("click", () => firebase.auth().signOut());
+
 // =====================================================
 // CRYSTAL CHRISTMAS — ADMIN PANEL
 // =====================================================
@@ -278,8 +323,14 @@ async function uploadGalleryFiles(productId) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const path = `products/${productId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`;
         const ref = storage.ref().child(path);
-        await ref.put(file, { contentType: file.type });
-        urls.push(await ref.getDownloadURL());
+        const uploadTask = ref.put(file, { contentType: file.type });
+        const timeout = setTimeout(() => uploadTask.cancel(), 45000);
+        try {
+            await uploadTask;
+            urls.push(await ref.getDownloadURL());
+        } finally {
+            clearTimeout(timeout);
+        }
     }
     return urls;
 }
@@ -290,6 +341,7 @@ async function uploadGalleryFiles(productId) {
 
 productForm.addEventListener("submit", async function(event) {
     event.preventDefault();
+    if (!adminAuthorized) { alert("Спочатку увійдіть як адміністратор."); return; }
     const name = productName.value.trim();
     const price = Number(productPrice.value);
     const category = productCategory.value.trim();
@@ -300,16 +352,22 @@ productForm.addEventListener("submit", async function(event) {
     }
     const id = editingProductId !== null ? editingProductId : Date.now();
     const saveButton = productForm.querySelector('[type="submit"]');
-    if (saveButton) saveButton.disabled = true;
+    if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.textContent = "ЗБЕРІГАЄМО...";
+    }
     try {
         const uploaded = await uploadGalleryFiles(id);
         const images = [...galleryImages, ...uploaded];
         const product = { id, name, price, category, description, inStock, images, image: images[0] || "" };
         // Wait for the actual Firestore write before reporting success.
-        await db.collection("products").doc(String(id)).set({
-            name, price, category, description, inStock,
-            images, image: product.image, updatedAt: serverTimestamp()
-        });
+        await Promise.race([
+            db.collection("products").doc(String(id)).set({
+                name, price, category, description, inStock,
+                images, image: product.image, updatedAt: serverTimestamp()
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Firebase не відповідає. Перевірте інтернет і права доступу.")), 20000))
+        ]);
         const index = products.findIndex(p => String(p.id) === String(id));
         if (index >= 0) products[index] = product;
         else products.push(product);
@@ -320,7 +378,10 @@ productForm.addEventListener("submit", async function(event) {
         console.error("Не вдалося зберегти товар", error);
         alert("Помилка збереження: " + (error.message || error) + ". Перевірте Firebase Storage і правила доступу.");
     } finally {
-        if (saveButton) saveButton.disabled = false;
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.textContent = "ЗБЕРЕГТИ ТОВАР";
+        }
     }
 });
 
@@ -672,6 +733,10 @@ function resetProductForm() {
 
     productImage.value =
         "";
+
+    galleryImages = [];
+    pendingPhotoFiles = [];
+    drawGalleryPreview();
 
 
     formTitle.textContent =
@@ -1563,20 +1628,4 @@ db.collection("orders").onSnapshot((snapshot) => {
     updateDashboard();
 }, error => console.error("Orders Firestore:", error));
 
-// Переносимо старі локальні товари у Firestore один раз, якщо база ще порожня.
-(async function migrateLocalProductsOnce() {
-    try {
-        const snap = await db.collection("products").limit(1).get();
-        const localProducts = JSON.parse(localStorage.getItem("crystalChristmasProducts")) || [];
-        if (snap.empty && localProducts.length) {
-            for (const product of localProducts) {
-                await db.collection("products").doc(String(product.id || Date.now())).set({
-                    name: product.name || "", price: Number(product.price) || 0,
-                    category: product.category || "", description: product.description || "",
-                    inStock: Boolean(product.inStock), image: product.image || "",
-                    updatedAt: serverTimestamp()
-                });
-            }
-        }
-    } catch (error) { console.error("Migration:", error); }
-})();
+// Automatic localStorage migration disabled to protect existing products.

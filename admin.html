@@ -26,6 +26,20 @@
 
 
 <body>
+<!-- Firebase administrator sign-in -->
+<div id="admin-auth-gate" role="dialog" aria-modal="true" aria-labelledby="admin-auth-title" style="position:fixed;inset:0;z-index:99999;background:#07182d;display:flex;align-items:center;justify-content:center;padding:20px;color:white;font-family:Arial,sans-serif">
+  <form id="admin-login-form" style="width:100%;max-width:390px;border:1px solid #d4af67;padding:32px;background:#0c2948">
+    <p style="color:#d4af67;letter-spacing:3px;font-size:11px">CRYSTAL CHRISTMAS</p>
+    <h2 id="admin-auth-title" style="font:normal 28px Georgia,serif;margin:16px 0 25px">Вхід в адмінку</h2>
+    <label for="admin-login-email" style="display:block;margin-bottom:8px">Email</label>
+    <input id="admin-login-email" type="email" autocomplete="username" required style="width:100%;padding:13px;margin-bottom:16px;color:#07182d;background:white;border:1px solid #d4af67">
+    <label for="admin-login-password" style="display:block;margin-bottom:8px">Пароль</label>
+    <input id="admin-login-password" type="password" autocomplete="current-password" required style="width:100%;padding:13px;margin-bottom:20px;color:#07182d;background:white;border:1px solid #d4af67">
+    <button id="admin-login-submit" type="submit" style="width:100%;padding:14px;background:#d4af67;border:0;color:#07182d;font-weight:bold;cursor:pointer">УВІЙТИ</button>
+    <p id="admin-login-error" role="alert" style="margin-top:15px;line-height:1.5;color:#ffcece"></p>
+  </form>
+</div>
+
 
 
 <!-- =====================================================
@@ -834,7 +848,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="firebase.js"></script>
-<script src="admin.js?v=gallery-20261012"></script>
+<script src="admin.js?v=authfix-20261031"></script>
 
 
 </body>
