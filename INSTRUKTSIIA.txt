@@ -1,0 +1,10 @@
+CRYSTAL CHRISTMAS — ВХІД ЧЕРЕЗ GOOGLE
+
+1. Завантаж усі файли цього архіву в корінь GitHub-репозиторію.
+2. У Firebase Authentication → Sign-in method має бути увімкнений Google.
+3. У Firebase Authentication → Settings → Authorized domains має бути crystalchristmas.netlify.app.
+4. Відкрий /admin.html і натисни «УВІЙТИ ЧЕРЕЗ GOOGLE».
+5. ВАЖЛИВО: Google-акаунт, на відміну від попереднього Email/Password, зазвичай має ІНШИЙ UID. Якщо адмінка покаже «UID Google», заміни старий UID у двох місцях: (а) ADMIN_UID в admin.js, (б) UID в правилах Firestore у Firebase Console. Опублікуй правила та завантаж оновлений admin.js. Це потрібно зробити один раз. Не встановлюй allow write: if true.
+6. Після цього вхід зберігатиметься в браузері, і пароль від адмінки вводити не потрібно.
+
+Зверни увагу: просте приховане посилання без авторизації не захищає товари.

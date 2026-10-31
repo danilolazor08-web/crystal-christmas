@@ -6,38 +6,33 @@ const adminLoginForm = document.getElementById("admin-login-form");
 const adminLoginError = document.getElementById("admin-login-error");
 let adminAuthorized = false;
 
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
 firebase.auth().onAuthStateChanged(user => {
     adminAuthorized = !!user && user.uid === ADMIN_UID;
     adminAuthGate.style.display = adminAuthorized ? "none" : "flex";
+    const uidEl = document.getElementById("admin-login-uid");
     if (user && !adminAuthorized) {
-        adminLoginError.textContent = "Цей обліковий запис не має прав адміністратора.";
-    } else if (adminAuthorized) {
+        adminLoginError.textContent = "Google-вхід успішний, але цей Google-акаунт ще не має прав адміністратора. Замініть UID у FIRESTORE-RULES.txt та ADMIN_UID в admin.js на UID нижче.";
+        uidEl.textContent = "UID Google: " + user.uid;
+    } else {
         adminLoginError.textContent = "";
+        uidEl.textContent = "";
     }
 });
-
 adminLoginForm.addEventListener("submit", async event => {
     event.preventDefault();
     const button = document.getElementById("admin-login-submit");
     button.disabled = true;
-    button.textContent = "ВХІД...";
     adminLoginError.textContent = "";
     try {
-        const credential = await firebase.auth().signInWithEmailAndPassword(
-            document.getElementById("admin-login-email").value.trim(),
-            document.getElementById("admin-login-password").value
-        );
-        if (credential.user.uid !== ADMIN_UID) {
-            await firebase.auth().signOut();
-            throw new Error("Цей користувач не є адміністратором магазину.");
-        }
-        document.getElementById("admin-login-password").value = "";
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const current = firebase.auth().currentUser;
+        if (current && current.uid !== ADMIN_UID) await firebase.auth().signOut();
+        await firebase.auth().signInWithPopup(provider);
     } catch (error) {
-        adminLoginError.textContent = error.code === "auth/invalid-credential" || error.code === "auth/wrong-password"
-            ? "Неправильний email або пароль." : (error.message || "Не вдалося увійти.");
+        adminLoginError.textContent = "Помилка Google-входу: " + (error.message || error.code);
     } finally {
         button.disabled = false;
-        button.textContent = "УВІЙТИ";
     }
 });
 
