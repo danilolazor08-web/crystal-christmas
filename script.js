@@ -28,16 +28,6 @@ let cart =
 const productsContainer =
     document.getElementById("products");
 
-const productSearchInput = document.getElementById("product-search");
-const searchResultsStatus = document.getElementById("search-results-status");
-let catalogLoaded = false;
-
-function normalizeSearch(value) {
-    return String(value || "").toLocaleLowerCase("uk-UA").normalize("NFC").trim();
-}
-
-productSearchInput?.addEventListener("input", () => renderProducts());
-
 const openCartButton =
     document.getElementById("open-cart");
 
@@ -72,22 +62,6 @@ function renderProducts() {
     productsContainer.innerHTML = "";
 
 
-    const searchTerm = normalizeSearch(productSearchInput?.value);
-    const visibleProducts = searchTerm
-        ? products.filter(product => normalizeSearch(product.name).includes(searchTerm))
-        : products;
-
-    if (searchResultsStatus) {
-        searchResultsStatus.textContent = searchTerm && catalogLoaded
-            ? `Знайдено товарів: ${visibleProducts.length}`
-            : "";
-    }
-
-    if (catalogLoaded && products.length > 0 && visibleProducts.length === 0) {
-        productsContainer.innerHTML = `<div class="catalog-empty"><h3>Нічого не знайдено</h3><p>Спробуйте іншу назву іграшки.</p></div>`;
-        return;
-    }
-
     // Якщо товарів немає
 
     if (products.length === 0) {
@@ -115,7 +89,7 @@ function renderProducts() {
 
     // Створюємо картки товарів
 
-    visibleProducts.forEach(product => {
+    products.forEach(product => {
 
         const article =
             document.createElement("article");
@@ -828,6 +802,14 @@ window.addEventListener(
     function() {
 
 
+        products =
+            JSON.parse(
+                localStorage.getItem(
+                    "crystalChristmasProducts"
+                )
+            ) || [];
+
+
         cart =
             JSON.parse(
                 localStorage.getItem(
@@ -850,7 +832,6 @@ window.addEventListener(
 
 // FIRESTORE — товари однакові на всіх пристроях
 db.collection("products").onSnapshot((snapshot) => {
-    catalogLoaded = true;
     products = snapshot.docs.map(doc => ({
         id: Number(doc.id) || doc.id,
         ...doc.data()
