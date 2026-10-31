@@ -1,42 +1,34 @@
 
-// Firebase sign-in: Firestore writes are allowed only for this account.
-const ADMIN_UID = "v69rs6QQh8QI4YbFb3sHlqmKQdj2";
-const adminAuthGate = document.getElementById("admin-auth-gate");
-const adminLoginForm = document.getElementById("admin-login-form");
-const adminLoginError = document.getElementById("admin-login-error");
+// Automatic anonymous Firebase session, stored on this browser.
+// The site link alone does not grant write permissions: Firestore checks the UID.
+const ADMIN_UID = "PASTE_YOUR_ANONYMOUS_UID_HERE";
 let adminAuthorized = false;
-
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
-firebase.auth().onAuthStateChanged(user => {
-    adminAuthorized = !!user && user.uid === ADMIN_UID;
-    adminAuthGate.style.display = adminAuthorized ? "none" : "flex";
-    const uidEl = document.getElementById("admin-login-uid");
-    if (user && !adminAuthorized) {
-        adminLoginError.textContent = "Google-вхід успішний, але цей Google-акаунт ще не має прав адміністратора. Замініть UID у FIRESTORE-RULES.txt та ADMIN_UID в admin.js на UID нижче.";
-        uidEl.textContent = "UID Google: " + user.uid;
-    } else {
-        adminLoginError.textContent = "";
-        uidEl.textContent = "";
-    }
-});
-adminLoginForm.addEventListener("submit", async event => {
-    event.preventDefault();
-    const button = document.getElementById("admin-login-submit");
-    button.disabled = true;
+const adminAuthGate = document.getElementById("admin-auth-gate");
+const adminLoginError = document.getElementById("admin-login-error");
+const adminLoginUid = document.getElementById("admin-login-uid");
+const adminLoginForm = document.getElementById("admin-login-form");
+adminLoginForm.addEventListener("submit", e => e.preventDefault());
+const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => { if (!auth.currentUser) return auth.signInAnonymously(); })
+  .catch(e => { adminLoginError.textContent = "Не вдалося відкрити сесію: " + e.message; });
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    try { await auth.signInAnonymously(); } catch (e) { adminLoginError.textContent = "Увімкни Anonymous у Firebase Authentication → Sign-in method: " + e.message; }
+    return;
+  }
+  adminAuthorized = user.uid === ADMIN_UID;
+  adminAuthGate.style.display = adminAuthorized ? "none" : "flex";
+  if (!adminAuthorized) {
+    adminLoginError.textContent = "Перший запуск: скопіюй UID нижче, встав його в admin.js (ADMIN_UID) та FIRESTORE-RULES.txt, опублікуй правила і файли. Після цього вхід буде автоматичним на цьому браузері.";
+    adminLoginUid.textContent = "UID цього браузера: " + user.uid;
+  } else {
     adminLoginError.textContent = "";
-    try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const current = firebase.auth().currentUser;
-        if (current && current.uid !== ADMIN_UID) await firebase.auth().signOut();
-        await firebase.auth().signInWithPopup(provider);
-    } catch (error) {
-        adminLoginError.textContent = "Помилка Google-входу: " + (error.message || error.code);
-    } finally {
-        button.disabled = false;
-    }
+    adminLoginUid.textContent = "";
+  }
 });
-
-document.getElementById("logout-button").addEventListener("click", () => firebase.auth().signOut());
+const logoutButton = document.getElementById("logout-button");
+if (logoutButton) logoutButton.style.display = "none";
 
 // =====================================================
 // CRYSTAL CHRISTMAS — ADMIN PANEL

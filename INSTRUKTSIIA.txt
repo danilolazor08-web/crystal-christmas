@@ -1,10 +1,16 @@
-CRYSTAL CHRISTMAS — ВХІД ЧЕРЕЗ GOOGLE
+CRYSTAL CHRISTMAS — ВХІД ЗА ПОСИЛАННЯМ (БЕЗ ПАРОЛЯ)
 
-1. Завантаж усі файли цього архіву в корінь GitHub-репозиторію.
-2. У Firebase Authentication → Sign-in method має бути увімкнений Google.
-3. У Firebase Authentication → Settings → Authorized domains має бути crystalchristmas.netlify.app.
-4. Відкрий /admin.html і натисни «УВІЙТИ ЧЕРЕЗ GOOGLE».
-5. ВАЖЛИВО: Google-акаунт, на відміну від попереднього Email/Password, зазвичай має ІНШИЙ UID. Якщо адмінка покаже «UID Google», заміни старий UID у двох місцях: (а) ADMIN_UID в admin.js, (б) UID в правилах Firestore у Firebase Console. Опублікуй правила та завантаж оновлений admin.js. Це потрібно зробити один раз. Не встановлюй allow write: if true.
-6. Після цього вхід зберігатиметься в браузері, і пароль від адмінки вводити не потрібно.
+ВАЖЛИВО: секретне посилання саме по собі не захищає базу. Тому ми використовуємо анонімну сесію Firebase, яка автоматично запам’ятовується в одному браузері.
 
-Зверни увагу: просте приховане посилання без авторизації не захищає товари.
+ОДНОРАЗОВЕ НАЛАШТУВАННЯ:
+1. Firebase Console → Authentication → Sign-in method → Anonymous → Enable → Save.
+2. Завантаж файли цього ZIP на GitHub, дочекайся Netlify.
+3. Відкрий /admin.html у своєму звичайному браузері (не інкогніто). На екрані побачиш UID цього браузера.
+4. Скопіюй UID і заміни PASTE_YOUR_ANONYMOUS_UID_HERE у ДВОХ файлах: admin.js і FIRESTORE-RULES.txt.
+5. Скопіюй вміст FIRESTORE-RULES.txt у Firebase Console → Firestore Database → Rules → Publish.
+6. Завантаж оновлений admin.js на GitHub.
+7. Онови /admin.html: адмінка відкриється без входу, з правом зберігати товари.
+
+НЕ видаляй дані сайту/куки для домену, не заходь в інкогніто: анонімний UID може загубитися. Якщо це станеться, доведеться повторити прив’язку. На іншому пристрої потрібна окрема прив’язка.
+
+НЕ став allow write: if true у Firestore Rules. Це дозволить будь-кому змінювати товари.
