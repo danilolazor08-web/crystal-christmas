@@ -1,3 +1,44 @@
+
+// Firebase sign-in: Firestore writes are allowed only for this account.
+const ADMIN_UID = "v69rs6QQh8QI4YbFb3sHlqmKQdj2";
+const adminAuthGate = document.getElementById("admin-auth-gate");
+const adminLoginForm = document.getElementById("admin-login-form");
+const adminLoginError = document.getElementById("admin-login-error");
+let adminAuthorized = false;
+
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
+firebase.auth().onAuthStateChanged(user => {
+    adminAuthorized = !!user && user.uid === ADMIN_UID;
+    adminAuthGate.style.display = adminAuthorized ? "none" : "flex";
+    const uidEl = document.getElementById("admin-login-uid");
+    if (user && !adminAuthorized) {
+        adminLoginError.textContent = "Google-вхід успішний, але цей Google-акаунт ще не має прав адміністратора. Замініть UID у FIRESTORE-RULES.txt та ADMIN_UID в admin.js на UID нижче.";
+        uidEl.textContent = "UID Google: " + user.uid + " (скопіюй цей UID для правил Firebase)";
+    } else {
+        adminLoginError.textContent = "";
+        uidEl.textContent = "";
+    }
+});
+adminLoginForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = document.getElementById("admin-login-submit");
+    button.disabled = true;
+    adminLoginError.textContent = "";
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({prompt: "select_account"});
+        const current = firebase.auth().currentUser;
+        if (current && current.uid !== ADMIN_UID) await firebase.auth().signOut();
+        await firebase.auth().signInWithPopup(provider);
+    } catch (error) {
+        adminLoginError.textContent = "Помилка Google-входу: " + (error.message || error.code);
+    } finally {
+        button.disabled = false;
+    }
+});
+
+document.getElementById("logout-button").addEventListener("click", () => firebase.auth().signOut());
+
 // =====================================================
 // CRYSTAL CHRISTMAS — ADMIN PANEL
 // =====================================================
@@ -261,27 +302,52 @@ productImage.addEventListener("change", event => {
         if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
             alert("Дозволені JPG, PNG або WEBP."); continue;
         }
-        if (file.size > 8 * 1024 * 1024) {
-            alert("Максимальний розмір одного фото — 8 МБ."); continue;
+        if (file.size > 25 * 1024 * 1024) {
+            alert("Максимальний розмір одного фото — 25 МБ."); continue;
         }
         pendingPhotoFiles.push(file);
     }
     event.target.value = "";
     drawGalleryPreview();
 });
-async function uploadGalleryFiles(productId) {
-    if (!pendingPhotoFiles.length) return [];
-    if (!firebase.storage) throw new Error("Firebase Storage не підключений");
-    const storage = firebase.storage();
-    const urls = [];
+// Keep photos inside the Firestore product document: no paid Storage bucket required.
+function compressPhoto(file, maxSide = 900, quality = 0.72) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+            try {
+                const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+                canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/jpeg", quality));
+            } catch (error) { reject(error); }
+            finally { URL.revokeObjectURL(objectUrl); }
+        };
+        img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Не вдалося прочитати фото.")); };
+        img.src = objectUrl;
+    });
+}
+async function uploadGalleryFiles() {
+    const result = [];
+    // Keep the complete Firestore document comfortably below the 1 MiB limit.
     for (const file of pendingPhotoFiles) {
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `products/${productId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`;
-        const ref = storage.ref().child(path);
-        await ref.put(file, { contentType: file.type });
-        urls.push(await ref.getDownloadURL());
+        let encoded = "";
+        for (const [side, quality] of [[700, .65], [560, .56], [420, .48], [320, .4], [240, .32]]) {
+            encoded = await compressPhoto(file, side, quality);
+            if (encoded.length < 85000) break;
+        }
+        result.push(encoded);
     }
-    return urls;
+    return result;
+}
+function imageBytes(images) {
+    return new Blob([JSON.stringify(images)]).size;
 }
 
 // =====================================================
@@ -290,6 +356,7 @@ async function uploadGalleryFiles(productId) {
 
 productForm.addEventListener("submit", async function(event) {
     event.preventDefault();
+    if (!adminAuthorized) { alert("Спочатку увійдіть як адміністратор."); return; }
     const name = productName.value.trim();
     const price = Number(productPrice.value);
     const category = productCategory.value.trim();
@@ -300,16 +367,26 @@ productForm.addEventListener("submit", async function(event) {
     }
     const id = editingProductId !== null ? editingProductId : Date.now();
     const saveButton = productForm.querySelector('[type="submit"]');
-    if (saveButton) saveButton.disabled = true;
+    if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.textContent = "ЗБЕРІГАЄМО...";
+    }
     try {
         const uploaded = await uploadGalleryFiles(id);
         const images = [...galleryImages, ...uploaded];
+        // The first image is also stored in `image` for the catalog, so count it twice.
+        if (imageBytes(images) + (images[0] || "").length > 650000) {
+            throw new Error("Загальний розмір фотографій завеликий. Приберіть частину фото й повторіть.");
+        }
         const product = { id, name, price, category, description, inStock, images, image: images[0] || "" };
         // Wait for the actual Firestore write before reporting success.
-        await db.collection("products").doc(String(id)).set({
-            name, price, category, description, inStock,
-            images, image: product.image, updatedAt: serverTimestamp()
-        });
+        await Promise.race([
+            db.collection("products").doc(String(id)).set({
+                name, price, category, description, inStock,
+                images, image: product.image, updatedAt: serverTimestamp()
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Firebase не відповідає. Перевірте інтернет і права доступу.")), 20000))
+        ]);
         const index = products.findIndex(p => String(p.id) === String(id));
         if (index >= 0) products[index] = product;
         else products.push(product);
@@ -318,9 +395,12 @@ productForm.addEventListener("submit", async function(event) {
         showNotification("Товар і фотографії збережено");
     } catch (error) {
         console.error("Не вдалося зберегти товар", error);
-        alert("Помилка збереження: " + (error.message || error) + ". Перевірте Firebase Storage і правила доступу.");
+        alert("Помилка збереження: " + (error.message || error) + ". Перевірте вхід адміністратора та правила Firestore.");
     } finally {
-        if (saveButton) saveButton.disabled = false;
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.textContent = "ЗБЕРЕГТИ ТОВАР";
+        }
     }
 });
 
@@ -672,6 +752,10 @@ function resetProductForm() {
 
     productImage.value =
         "";
+
+    galleryImages = [];
+    pendingPhotoFiles = [];
+    drawGalleryPreview();
 
 
     formTitle.textContent =
@@ -1556,27 +1640,16 @@ db.collection("products").onSnapshot((snapshot) => {
     updateDashboard();
 }, error => console.error("Products Firestore:", error));
 
-db.collection("orders").onSnapshot((snapshot) => {
+let unsubscribeOrders = null;
+firebase.auth().onAuthStateChanged(user => {
+    if (unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
+    if (!user || user.uid !== ADMIN_UID) { orders = []; renderOrders(); updateDashboard(); return; }
+    unsubscribeOrders = db.collection("orders").onSnapshot((snapshot) => {
     orders = snapshot.docs.map(doc => ({ id: Number(doc.id) || doc.id, ...doc.data() }));
     orders.sort((a, b) => Number(b.id) - Number(a.id));
     renderOrders();
     updateDashboard();
-}, error => console.error("Orders Firestore:", error));
+}, error => { console.error("Orders Firestore:", error); showNotification("Помилка читання замовлень: " + error.message); });
+});
 
-// Переносимо старі локальні товари у Firestore один раз, якщо база ще порожня.
-(async function migrateLocalProductsOnce() {
-    try {
-        const snap = await db.collection("products").limit(1).get();
-        const localProducts = JSON.parse(localStorage.getItem("crystalChristmasProducts")) || [];
-        if (snap.empty && localProducts.length) {
-            for (const product of localProducts) {
-                await db.collection("products").doc(String(product.id || Date.now())).set({
-                    name: product.name || "", price: Number(product.price) || 0,
-                    category: product.category || "", description: product.description || "",
-                    inStock: Boolean(product.inStock), image: product.image || "",
-                    updatedAt: serverTimestamp()
-                });
-            }
-        }
-    } catch (error) { console.error("Migration:", error); }
-})();
+// Automatic localStorage migration disabled to protect existing products.

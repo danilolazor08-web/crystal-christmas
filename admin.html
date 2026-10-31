@@ -26,6 +26,18 @@
 
 
 <body>
+<!-- Firebase administrator sign-in -->
+<div id="admin-auth-gate" role="dialog" aria-modal="true" aria-labelledby="admin-auth-title" style="position:fixed;inset:0;z-index:99999;background:#07182d;display:flex;align-items:center;justify-content:center;padding:20px;color:white;font-family:Arial,sans-serif">
+  <form id="admin-login-form" style="width:100%;max-width:390px;border:1px solid #d4af67;padding:32px;background:#0c2948">
+    <p style="color:#d4af67;letter-spacing:3px;font-size:11px">CRYSTAL CHRISTMAS</p>
+    <h2 id="admin-auth-title" style="font:normal 28px Georgia,serif;margin:16px 0 25px">Вхід в адмінку</h2>
+    <p style="line-height:1.6;color:#e2e8f0">Увійди своїм Google-акаунтом. Браузер запам’ятає вхід.</p>
+    <button id="admin-login-submit" type="submit" style="width:100%;padding:14px;background:#d4af67;border:0;color:#07182d;font-weight:bold;cursor:pointer">УВІЙТИ ЧЕРЕЗ GOOGLE</button>
+    <p id="admin-login-uid" style="font-size:12px;word-break:break-all;color:#d4af67"></p>
+    <p id="admin-login-error" role="alert" style="margin-top:15px;line-height:1.5;color:#ffcece"></p>
+  </form>
+</div>
+
 
 
 <!-- =====================================================
@@ -834,7 +846,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="firebase.js"></script>
-<script src="admin.js?v=gallery-20261012"></script>
+<script src="admin.js?v=photo-small-20261101"></script>
 
 
 </body>

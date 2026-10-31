@@ -223,7 +223,7 @@ function updateTotal() {
 
 checkoutForm.addEventListener(
     "submit",
-    function(event) {
+    async function(event) {
 
         event.preventDefault();
 
@@ -441,13 +441,16 @@ checkoutForm.addEventListener(
         orders.unshift(order);
 
         // Зберігаємо замовлення у Firestore — воно з'явиться в адмінці на будь-якому пристрої
-        db.collection("orders").doc(String(order.id)).set({
-            ...order,
-            createdAt: serverTimestamp()
-        }).catch((error) => {
-            console.error(error);
-            alert("Не вдалося зберегти замовлення. Перевірте Firebase.");
-        });
+        try {
+            await db.collection("orders").doc(String(order.id)).set({
+                ...order,
+                createdAt: serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Помилка замовлення:", error);
+            alert("Замовлення не збережено. Спробуйте ще раз або зателефонуйте нам. " + error.message);
+            return;
+        }
 
 
         // -------------------------
