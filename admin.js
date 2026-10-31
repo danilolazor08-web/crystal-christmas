@@ -224,224 +224,82 @@ dashboardOpenOrders.addEventListener("click", function() {
 // 5. PRODUCT IMAGE
 // =====================================================
 
-productImage.addEventListener("change", function(event) {
-
-    const file =
-        event.target.files[0];
-
-
-    if (!file) {
-        return;
-    }
-
-
-    if (!file.type.startsWith("image/")) {
-
-        alert("Оберіть фотографію.");
-
+productImage.addEventListener("change", async function(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { alert("Оберіть фото JPG, PNG або WebP."); return; }
+    try {
+        selectedImage = await compressSinglePhoto(file);
+        imagePreview.src = selectedImage;
+        imagePreview.style.display = "block";
+        uploadPlaceholder.style.display = "none";
+    } catch (error) {
+        console.error(error);
+        alert("Не вдалося обробити фото: " + error.message);
         productImage.value = "";
-
-        return;
     }
-
-
-    if (file.size > 3 * 1024 * 1024) {
-
-        alert(
-            "Фото завелике. Для локальної версії використайте фото до 3 МБ."
-        );
-
-        productImage.value = "";
-
-        return;
-    }
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload = function(event) {
-
-        selectedImage =
-            event.target.result;
-
-
-        imagePreview.src =
-            selectedImage;
-
-
-        imagePreview.style.display =
-            "block";
-
-
-        uploadPlaceholder.style.display =
-            "none";
-
-    };
-
-
-    reader.readAsDataURL(file);
-
 });
 
+function compressSinglePhoto(file) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+            try {
+                const ratio = Math.min(1, 1100 / Math.max(img.naturalWidth, img.naturalHeight));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(img.naturalWidth * ratio));
+                canvas.height = Math.max(1, Math.round(img.naturalHeight * ratio));
+                canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+                let data = canvas.toDataURL("image/jpeg", 0.72);
+                if (data.length > 650000) data = canvas.toDataURL("image/jpeg", 0.48);
+                URL.revokeObjectURL(objectUrl);
+                if (data.length > 800000) reject(new Error("Фото завелике навіть після стиснення"));
+                else resolve(data);
+            } catch(e) { URL.revokeObjectURL(objectUrl); reject(e); }
+        };
+        img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Файл фото не відкривається")); };
+        img.src = objectUrl;
+    });
+}
 
 // =====================================================
 // 6. SAVE PRODUCT
 // =====================================================
 
-productForm.addEventListener("submit", function(event) {
-
+productForm.addEventListener("submit", async function(event) {
     event.preventDefault();
-
-
-    const name =
-        productName.value.trim();
-
-    const price =
-        Number(productPrice.value);
-
-    const category =
-        productCategory.value.trim();
-
-    const description =
-        productDescription.value.trim();
-
-    const inStock =
-        productStock.checked;
-
-
-    if (!name) {
-
-        alert("Введіть назву товару.");
-
-        return;
+    const name = productName.value.trim();
+    const price = Number(productPrice.value);
+    const category = productCategory.value.trim();
+    const description = productDescription.value.trim();
+    const inStock = productStock.checked;
+    if (!name || !category || !Number.isFinite(price) || price <= 0) {
+        alert("Заповни назву, категорію та правильну ціну."); return;
     }
-
-
-    if (!price || price <= 0) {
-
-        alert("Введіть правильну ціну.");
-
-        return;
+    if (!auth.currentUser || auth.currentUser.uid !== ADMIN_UID) {
+        alert("Спочатку увійди в обліковий запис адміністратора."); return;
     }
-
-
-    if (!category) {
-
-        alert("Введіть категорію.");
-
-        return;
-    }
-
-
-    // EDIT
-
-    if (editingProductId !== null) {
-
-        const index =
-            products.findIndex(
-                product =>
-                    Number(product.id) ===
-                    Number(editingProductId)
-            );
-
-
-        if (index !== -1) {
-
-            products[index] = {
-
-                ...products[index],
-
-                name,
-                price,
-                category,
-                description,
-                inStock,
-
-                image:
-                    selectedImage ||
-                    products[index].image ||
-                    ""
-
-            };
-
-        }
-
-
-        showNotification(
-            "Товар оновлено"
-        );
-
-    }
-
-    // NEW PRODUCT
-
-    else {
-
-        const newProduct = {
-
-            id: Date.now(),
-
-            name,
-            price,
-            category,
-            description,
-            inStock,
-
-            image:
-                selectedImage || ""
-
-        };
-
-
-        products.push(newProduct);
-
-
-        showNotification(
-            "Товар додано"
-        );
-
-    }
-
-
-    saveProducts();
-
-    renderProducts();
-
-    updateDashboard();
-
-    resetProductForm();
-
-    showSection("products-section");
-
+    const existing = editingProductId !== null
+        ? products.find(p => String(p.id) === String(editingProductId)) : null;
+    const id = existing ? String(existing.id) : String(Date.now());
+    const product = {
+        name, price, category, description, inStock,
+        image: selectedImage || existing?.image || "",
+        updatedAt: serverTimestamp()
+    };
+    const button = productForm.querySelector('[type="submit"]');
+    if (button) button.disabled = true;
+    try {
+        await db.collection("products").doc(id).set(product, {merge: true});
+        showNotification(existing ? "Товар оновлено" : "Товар додано");
+        resetProductForm();
+        showSection("products-section");
+    } catch(error) {
+        console.error("Збереження товару:", error);
+        alert("Firebase не зберіг товар: " + (error.message || error.code || "невідома помилка"));
+    } finally { if (button) button.disabled = false; }
 });
-
-
-// =====================================================
-// 7. SAVE PRODUCTS
-// =====================================================
-
-function saveProducts() {
-    products.forEach(product => {
-        db.collection("products")
-            .doc(String(product.id))
-            .set({
-                name: product.name || "",
-                price: Number(product.price) || 0,
-                category: product.category || "",
-                description: product.description || "",
-                inStock: Boolean(product.inStock),
-                image: product.image || "",
-                updatedAt: serverTimestamp()
-            })
-            .catch(error => {
-                console.error(error);
-                alert("Не вдалося зберегти товар у Firebase.");
-            });
-    });
-}
-
 
 // =====================================================
 // 8. RENDER PRODUCTS
@@ -1652,19 +1510,4 @@ db.collection("orders").onSnapshot((snapshot) => {
 }, error => console.error("Orders Firestore:", error));
 
 // Переносимо старі локальні товари у Firestore один раз, якщо база ще порожня.
-(async function migrateLocalProductsOnce() {
-    try {
-        const snap = await db.collection("products").limit(1).get();
-        const localProducts = JSON.parse(localStorage.getItem("crystalChristmasProducts")) || [];
-        if (snap.empty && localProducts.length) {
-            for (const product of localProducts) {
-                await db.collection("products").doc(String(product.id || Date.now())).set({
-                    name: product.name || "", price: Number(product.price) || 0,
-                    category: product.category || "", description: product.description || "",
-                    inStock: Boolean(product.inStock), image: product.image || "",
-                    updatedAt: serverTimestamp()
-                });
-            }
-        }
-    } catch (error) { console.error("Migration:", error); }
-})();
+// Автоматичну міграцію вимкнено, щоб не перезаписувати товари.

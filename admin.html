@@ -26,6 +26,18 @@
 
 
 <body>
+<div id="admin-auth-gate" style="position:fixed;inset:0;z-index:99999;background:#081b34;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Arial,sans-serif;color:#fff">
+  <div style="background:#102b4d;border:1px solid #d6ae60;padding:30px;max-width:430px;width:100%">
+    <h2 style="font-family:Georgia,serif">Crystal Christmas — адмінка</h2>
+    <p>Увійди один раз. Браузер запам’ятає сеанс.</p>
+    <input id="auth-email" type="email" placeholder="Email Firebase" autocomplete="username" style="box-sizing:border-box;width:100%;padding:12px;margin-bottom:10px">
+    <input id="auth-password" type="password" placeholder="Пароль" autocomplete="current-password" style="box-sizing:border-box;width:100%;padding:12px;margin-bottom:10px">
+    <button id="auth-email-btn" type="button" style="width:100%;padding:13px;background:#d6ae60;border:0;font-weight:bold">Увійти</button>
+    <button id="auth-google-btn" type="button" style="width:100%;padding:13px;margin-top:10px;background:#fff;border:0;font-weight:bold">Або увійти через Google</button>
+    <p id="auth-error" role="alert" style="color:#ffb8b8;overflow-wrap:anywhere"></p>
+  </div>
+</div>
+
 
 
 <!-- =====================================================
@@ -831,6 +843,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="firebase.js"></script>
+<script src="admin-access.js"></script>
 <script src="admin.js"></script>
 
 
