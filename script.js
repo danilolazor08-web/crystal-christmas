@@ -307,7 +307,7 @@ function renderProducts() {
 
 
     connectAddButtons();
-    connectProductDetails();
+    connectProductDetails(visibleProducts);
 
 }
 
@@ -872,14 +872,14 @@ db.collection("products").onSnapshot((snapshot) => {
 updateCart();
 
 /* PRODUCT DETAILS: click a product card to open a compact photo preview */
-function connectProductDetails() {
+function connectProductDetails(visibleProducts) {
     document.querySelectorAll(".product").forEach((card, index) => {
         card.tabIndex = 0;
         card.setAttribute("role", "button");
-        card.setAttribute("aria-label", "Переглянути товар " + (products[index]?.name || ""));
+        card.setAttribute("aria-label", "Переглянути товар " + (visibleProducts[index]?.name || ""));
         const open = (event) => {
             if (event.target.closest(".add-cart")) return;
-            showProductDetails(products[index]);
+            showProductDetails(visibleProducts[index]);
         };
         card.addEventListener("click", open);
         card.addEventListener("keydown", (event) => {

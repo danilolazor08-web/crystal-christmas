@@ -1332,3 +1332,32 @@ html body .crystal-product-picture img {
 .catalog-search-field input::-webkit-search-cancel-button { cursor: pointer; }
 .search-results-status { min-height: 20px; margin-top: 9px; font-size: 12px; color: rgba(255,255,255,.78); }
 @media(max-width: 600px) { .catalog-search { margin: -10px 0 28px; } }
+
+/* Compact catalog: smaller cards and tap-to-enlarge product details */
+@media (min-width: 901px) {
+  html body .products { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px; }
+  html body .product-info { padding: 18px; }
+  html body .product h3 { font-size: 21px; line-height: 1.25; }
+  html body .product-image { padding: 12px; }
+}
+@media (max-width: 900px) {
+  html body .products { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+  html body .product-info { padding: 12px; }
+  html body .product-image { aspect-ratio: 1 / 1 !important; padding: 9px; }
+  html body .product-category { font-size: 7px; letter-spacing: 1px; margin-bottom: 7px; }
+  html body .product h3 { font-size: 17px; line-height: 1.25; margin-bottom: 8px; overflow-wrap: anywhere; }
+  html body .product-description { display: none; }
+  html body .product-bottom { margin-top: 10px; padding-top: 10px; gap: 6px; }
+  html body .product-bottom strong { font-size: 15px; }
+  html body .add-cart { width: 36px; height: 36px; flex-shrink: 0; }
+  html body .product { transition: box-shadow .2s; }
+  html body .product:hover { transform: none; }
+}
+@media (max-width: 360px) {
+  html body .products { gap: 8px; }
+  html body .product-info { padding: 9px; }
+  html body .product h3 { font-size: 15px; }
+  html body .product-bottom strong { font-size: 13px; }
+}
+html body .product { cursor: pointer; }
+html body .product:focus-visible { outline: 2px solid #d4af67; outline-offset: 3px; }
