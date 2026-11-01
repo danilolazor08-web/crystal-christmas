@@ -1,3 +1,8 @@
+// Automatic anonymous Firebase session — no sign-in form.
+window.adminReady = firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => firebase.auth().currentUser || firebase.auth().signInAnonymously())
+  .catch(error => { alert("Firebase: не вдалося відкрити адмінку. Увімкни Anonymous у Firebase Authentication → Sign-in method. " + error.message); throw error; });
+
 // =====================================================
 // CRYSTAL CHRISTMAS — ADMIN PANEL
 // =====================================================
@@ -290,7 +295,7 @@ productImage.addEventListener("change", function(event) {
 // 6. SAVE PRODUCT
 // =====================================================
 
-productForm.addEventListener("submit", function(event) {
+productForm.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
@@ -405,7 +410,19 @@ productForm.addEventListener("submit", function(event) {
     }
 
 
-    saveProducts();
+    try {
+        const productToSave = editingProductId !== null ? products.find(p => Number(p.id) === Number(editingProductId)) : products[products.length - 1];
+        if (!productToSave) throw new Error("Товар не знайдено");
+        if (!firebase.auth().currentUser) await window.adminReady;
+        await db.collection("products").doc(String(productToSave.id)).set({
+            name: productToSave.name, price: productToSave.price, category: productToSave.category,
+            description: productToSave.description, inStock: productToSave.inStock, image: productToSave.image || "",
+            updatedAt: serverTimestamp()
+        });
+    } catch(e) {
+        alert("Товар НЕ збережено: " + (e.message || e));
+        return;
+    }
 
     renderProducts();
 
@@ -1651,20 +1668,3 @@ db.collection("orders").onSnapshot((snapshot) => {
     updateDashboard();
 }, error => console.error("Orders Firestore:", error));
 
-// Переносимо старі локальні товари у Firestore один раз, якщо база ще порожня.
-(async function migrateLocalProductsOnce() {
-    try {
-        const snap = await db.collection("products").limit(1).get();
-        const localProducts = JSON.parse(localStorage.getItem("crystalChristmasProducts")) || [];
-        if (snap.empty && localProducts.length) {
-            for (const product of localProducts) {
-                await db.collection("products").doc(String(product.id || Date.now())).set({
-                    name: product.name || "", price: Number(product.price) || 0,
-                    category: product.category || "", description: product.description || "",
-                    inStock: Boolean(product.inStock), image: product.image || "",
-                    updatedAt: serverTimestamp()
-                });
-            }
-        }
-    } catch (error) { console.error("Migration:", error); }
-})();

@@ -1,0 +1,10 @@
+CRYSTAL CHRISTMAS — СТАРА АДМІНКА БЕЗ ПАРОЛЯ
+
+1. Firebase Console → Authentication → Sign-in method → Anonymous → Enable → Save.
+2. Firebase Console → Firestore Database → Rules: заміни правила на вміст FIRESTORE-RULES.txt → Publish.
+3. Завантаж файли сайту з цього ZIP у корінь GitHub-репозиторію → Commit. Netlify оновиться автоматично.
+4. Відкрий https://crystalchristmas.netlify.app/admin.html і перезавантаж Ctrl+Shift+R.
+
+ВАЖЛИВО: будь-яка людина з посиланням на адмінку може змінювати товари й читати замовлення. Це небезпечно для реального магазину. Рекомендовано згодом увімкнути захист.
+
+У цьому архіві відновлено старий інтерфейс з одним фото, виправлено Firebase API key, увімкнено автоматичний анонімний вхід, збереження товару тепер очікує підтвердження Firestore. Реальне збереження в розгорнутому Firebase не перевірено.

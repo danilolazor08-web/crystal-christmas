@@ -2,7 +2,7 @@
 // CRYSTAL CHRISTMAS — FIREBASE (COMPAT)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSyDqgECeNAMIyATME4NGd-xQe2XYSUL3v6w",
+    apiKey: "AIzaSyDqeCEhANMTyATME4NGd-xQe2XYSUL3v6w",
     authDomain: "crystal-christmas.firebaseapp.com",
     projectId: "crystal-christmas",
     storageBucket: "crystal-christmas.firebasestorage.app",
